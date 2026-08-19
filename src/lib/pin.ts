@@ -13,7 +13,11 @@
 
 const STORAGE_KEY = "frc:unlocked";
 
-export const SCORING_PIN = process.env.NEXT_PUBLIC_SCORING_PIN || "1848";
+export const SCORING_PIN = process.env.NEXT_PUBLIC_SCORING_PIN || "3454";
+
+/** How many dots the gate draws, and the digit count that auto-submits. Derived
+ *  from the code itself, so a longer NEXT_PUBLIC_SCORING_PIN still lines up. */
+export const PIN_LENGTH = SCORING_PIN.length;
 
 const listeners = new Set<() => void>();
 

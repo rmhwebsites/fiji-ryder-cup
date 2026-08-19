@@ -61,7 +61,7 @@ their home screen.
 ## The scoring code
 
 One shared code unlocks score entry for everybody — set `NEXT_PUBLIC_SCORING_PIN`,
-or leave it and the code is **1848**. Players enter it once and their phone
+or leave it and the code is **3454**. Players enter it once and their phone
 remembers it for the day.
 
 To be clear about what this is: a guard against a spectator fat-fingering a
