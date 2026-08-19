@@ -72,11 +72,13 @@ export function ScoreBoard({ standings }: { standings: Standings }) {
               style={{ width: `${gatorShare}%` }}
             />
           </div>
-          <div className="mt-2 flex items-center justify-between text-[10px] font-bold tracking-widest text-mute">
+          <div className="mt-2 flex items-center justify-between text-[10px] font-bold tracking-widest whitespace-nowrap text-mute">
             <span>{fmt(POINTS_TO_WIN)} TO WIN</span>
-            <span className="text-chalk">{status.toUpperCase()}</span>
             <span>{TOTAL_POINTS} PTS</span>
           </div>
+          <p className="mt-1.5 text-center text-[11px] leading-tight font-black tracking-[0.12em] text-chalk">
+            {status.toUpperCase()}
+          </p>
         </div>
 
         {/* Beer race */}

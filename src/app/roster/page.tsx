@@ -26,8 +26,13 @@ export default function RosterPage() {
             className="rounded-2xl border border-line bg-ink-2 p-3"
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="font-display text-[11px] font-black tracking-[0.16em] text-mute">
-                MATCH {match.no}
+              <span className="flex items-baseline gap-2">
+                <span className="font-display text-[11px] font-black tracking-[0.16em] text-mute">
+                  MATCH {match.no}
+                </span>
+                <span className="font-display text-[11px] font-black tabular text-chalk">
+                  {match.teeTime}
+                </span>
               </span>
               <Link
                 href={`/match/${match.no}`}

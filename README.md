@@ -67,8 +67,9 @@ think about it — keep tapping.
 
 ## Screens
 
-- **Live** — team score, the run to 10.5, the beer race, and all 10 matches with
-  their current status
+- **Live** — team score, the run to 10.5, the beer race, and all 10 matches.
+  A group shows its tee time until it posts a first score, then flips to its
+  live match status
 - **Matches** — every group; tap one to score it
 - **Teams** — the full draw with handicaps
 
@@ -80,8 +81,8 @@ teams pick up a half point.
 
 Everything about the event lives in two files:
 
-- [`src/lib/tournament.ts`](src/lib/tournament.ts) — teams, the 10 pairings, all
-  40 players and handicaps
+- [`src/lib/tournament.ts`](src/lib/tournament.ts) — teams, the 10 pairings and
+  tee times, all 40 players and handicaps
 - [`src/lib/course.ts`](src/lib/course.ts) — hole pars and the beer target
 
 ## Tests
@@ -90,6 +91,6 @@ Everything about the event lives in two files:
 npm test
 ```
 
-Covers the matchplay engine: best ball, scramble, hole winners, closeouts
-(`3&2`), dormie, halved nines, no-carryover, the beer pace bands, and a full
-10–10 tie.
+Covers the matchplay engine — best ball, scramble, hole winners, closeouts
+(`3&2`), dormie, halved nines, no-carryover, the beer pace bands and a full
+10–10 tie — plus the draw itself, checked group by group against the tee sheet.

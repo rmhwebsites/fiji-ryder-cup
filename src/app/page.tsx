@@ -44,7 +44,7 @@ export default function HomePage() {
         {upcoming.length > 0 && (
           <section>
             <SectionTitle>
-              {live.length || done.length ? "YET TO TEE OFF" : "THE DRAW"}
+              {live.length || done.length ? "YET TO TEE OFF" : "TEE TIMES"}
             </SectionTitle>
             <div className="space-y-2">
               {upcoming.map((m) => (

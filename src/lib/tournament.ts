@@ -46,6 +46,8 @@ export interface Player {
 export interface Match {
   /** 1-10, and the primary key used everywhere including the database. */
   no: number;
+  /** Shotgun-free draw — groups go off the first tee 12 minutes apart. */
+  teeTime: string;
   badgers: [Player, Player];
   gators: [Player, Player];
 }
@@ -53,6 +55,7 @@ export interface Match {
 export const MATCHES: Match[] = [
   {
     no: 1,
+    teeTime: "2:00 PM",
     badgers: [
       { name: "Chris Tanagho", handicap: 22 },
       { name: "Henry Grimsley", handicap: 9 },
@@ -64,6 +67,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 2,
+    teeTime: "2:12 PM",
     badgers: [
       { name: "Steele Alkhas", handicap: 11 },
       { name: "Josh Brannan", handicap: 14 },
@@ -75,28 +79,19 @@ export const MATCHES: Match[] = [
   },
   {
     no: 3,
+    teeTime: "2:24 PM",
     badgers: [
-      { name: "Blake Stern", handicap: 14 },
-      { name: "Ethan Golan", handicap: 17 },
+      { name: "Charlie Sutton", handicap: 16 },
+      { name: "Kiran Proctor", handicap: 3 },
     ],
     gators: [
-      { name: "Benny Evans", handicap: 13 },
-      { name: "Ryan Chain", handicap: 19 },
+      { name: "Will Jamieson", handicap: 14 },
+      { name: "Park Howell", handicap: 3 },
     ],
   },
   {
     no: 4,
-    badgers: [
-      { name: "Quinn Lyons", handicap: 9 },
-      { name: "Ethan Hiers", handicap: 12 },
-    ],
-    gators: [
-      { name: "Trey Hill", handicap: 10 },
-      { name: "Jack Fishpaw", handicap: 5 },
-    ],
-  },
-  {
-    no: 5,
+    teeTime: "2:36 PM",
     badgers: [
       { name: "Grady Bryan", handicap: 14 },
       { name: "Patrick Bryan", handicap: 10 },
@@ -107,7 +102,20 @@ export const MATCHES: Match[] = [
     ],
   },
   {
+    no: 5,
+    teeTime: "2:48 PM",
+    badgers: [
+      { name: "Jack Voci", handicap: 16 },
+      { name: "Elijah Pay", handicap: 19 },
+    ],
+    gators: [
+      { name: "Tucker Robbins", handicap: 18 },
+      { name: "James Levien", handicap: 16 },
+    ],
+  },
+  {
     no: 6,
+    teeTime: "3:00 PM",
     badgers: [
       { name: "Becker Curry", handicap: 10 },
       { name: "Clay Meredith", handicap: 16 },
@@ -119,39 +127,31 @@ export const MATCHES: Match[] = [
   },
   {
     no: 7,
+    teeTime: "3:12 PM",
     badgers: [
-      { name: "Jack Voci", handicap: 16 },
-      { name: "Elijah Pay", handicap: 19 },
+      { name: "Quinn Lyons", handicap: 9 },
+      { name: "Ethan Hiers", handicap: 12 },
     ],
     gators: [
-      { name: "Tucker Robbins", handicap: 18 },
-      { name: "James Levien", handicap: 16 },
+      { name: "Jack Fishpaw", handicap: 5 },
+      { name: "Trey Hill", handicap: 10 },
     ],
   },
   {
     no: 8,
+    teeTime: "3:24 PM",
     badgers: [
-      { name: "Charlie Sutton", handicap: 16 },
-      { name: "Kiran Proctor", handicap: 3 },
+      { name: "Blake Stern", handicap: 14 },
+      { name: "Ethan Golan", handicap: 17 },
     ],
     gators: [
-      { name: "Will Jamieson", handicap: 14 },
-      { name: "Park Howell", handicap: 3 },
+      { name: "Benny Evans", handicap: 13 },
+      { name: "Ryan Chain", handicap: 19 },
     ],
   },
   {
     no: 9,
-    badgers: [
-      { name: "Cole Dewey", handicap: 3 },
-      { name: "Canon Brooks", handicap: 9 },
-    ],
-    gators: [
-      { name: "Preston Hidy", handicap: -1 },
-      { name: "Nick Pope", handicap: 8 },
-    ],
-  },
-  {
-    no: 10,
+    teeTime: "3:36 PM",
     badgers: [
       { name: "Campbell Gosslee", handicap: 1 },
       { name: "Brooks Longgrear", handicap: 7 },
@@ -159,6 +159,18 @@ export const MATCHES: Match[] = [
     gators: [
       { name: "Will Strong", handicap: 3 },
       { name: "Carson Griffey", handicap: 10 },
+    ],
+  },
+  {
+    no: 10,
+    teeTime: "3:48 PM",
+    badgers: [
+      { name: "Cole Dewey", handicap: 3 },
+      { name: "Canon Brooks", handicap: 9 },
+    ],
+    gators: [
+      { name: "Preston Hidy", handicap: -1 },
+      { name: "Nick Pope", handicap: 8 },
     ],
   },
 ];

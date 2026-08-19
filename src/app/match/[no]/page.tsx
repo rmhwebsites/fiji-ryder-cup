@@ -20,6 +20,7 @@ import {
 import { getMatch, TEAMS, type TeamId } from "@/lib/tournament";
 import { useCelebrate } from "@/components/Celebrations";
 import { BeerCounter, ScoreStepper } from "@/components/HoleEntry";
+import { TeeTimeBar } from "@/components/MatchCard";
 import { PinPrompt, usePinGate } from "@/components/PinGate";
 import { useLive } from "@/components/TournamentProvider";
 import { BeerChip, SegmentPill, TEAM_STYLE } from "@/components/ui";
@@ -100,12 +101,26 @@ export default function MatchPage() {
             {surname(match.gators[0].name)} / {surname(match.gators[1].name)}
           </p>
         </div>
+        <div className="shrink-0 text-right">
+          <p className="text-[9px] font-black tracking-[0.14em] text-mute">
+            TEE
+          </p>
+          <p className="font-display text-sm font-black tabular text-chalk">
+            {match.teeTime}
+          </p>
+        </div>
       </header>
 
-      {/* Both nines at a glance */}
-      <div className="flex gap-2 px-3 pb-3">
-        <SegmentPill status={summary.front} />
-        <SegmentPill status={summary.back} />
+      {/* Both nines at a glance, once there is a score to show */}
+      <div className="px-3 pb-3">
+        {summary.started ? (
+          <div className="flex gap-2">
+            <SegmentPill status={summary.front} />
+            <SegmentPill status={summary.back} />
+          </div>
+        ) : (
+          <TeeTimeBar teeTime={match.teeTime} />
+        )}
       </div>
 
       {/* Hole strip */}
