@@ -43,7 +43,10 @@ sharing one live board, point it at Supabase.
    - **CLI**: `supabase link --project-ref <ref>` then `supabase db push`, which
      picks up [`supabase/migrations/`](supabase/migrations).
 3. Copy `.env.example` to `.env.local` and fill in the project URL and the
-   publishable (anon) key from **Project Settings → API Keys**.
+   **publishable key** (`sb_publishable_...`) from **Project Settings → API
+   Keys**. The **secret key** (`sb_secret_...`) from the same page is optional
+   and powers only `npm run reset` — it bypasses row level security, so it
+   never gets a `NEXT_PUBLIC_` prefix and never goes to Vercel.
 4. Restart `npm run dev`. The header should read **Live**.
 
 > **If `supabase db push` or `psql` cannot connect:** the direct connection
@@ -55,9 +58,22 @@ sharing one live board, point it at Supabase.
 
 ### Deploying
 
-Any Next.js host works. On Vercel: import the repo, add the same two
-environment variables, deploy. Send everyone the URL and tell them to add it to
-their home screen.
+Any Next.js host works. On Vercel: import the repo, add
+`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, deploy.
+(`NEXT_PUBLIC_` values bake in at build time — adding or changing one means
+redeploying.) Send everyone the URL and tell them to add it to their home
+screen.
+
+To wipe a test run before the real round:
+
+```bash
+npm run reset -- --yes
+```
+
+which clears every score and beer and verifies the tables read empty. It needs
+the secret key in `.env.local`; the truncate comment at the bottom of
+[`supabase/schema.sql`](supabase/schema.sql) does the same job from the SQL
+editor.
 
 ## Watching vs scoring
 
