@@ -101,13 +101,16 @@ export function GroupScorecard({
         <SegmentPill status={summary.back} />
       </div>
 
-      {/* The whole match, every score, and who took each hole */}
-      <MatchScorecard
-        match={match}
-        state={matchState}
-        currentHole={hole}
-        onPickHole={setHole}
-      />
+      {/* A spectator came to read the card, so it leads. A player came to
+          post a score — for them it moves below the entry card. */}
+      {!editable && (
+        <MatchScorecard
+          match={match}
+          state={matchState}
+          currentHole={hole}
+          onPickHole={setHole}
+        />
+      )}
 
       {/* Hole picker.
           Widths are a fraction of the visible strip — five across on a phone,
@@ -284,8 +287,16 @@ export function GroupScorecard({
         </div>
       </div>
 
-      {/* The beer card lives at the bottom of every matchup, spectator or
-          scorer alike — the full 18 with the pace verdicts on top. */}
+      {editable && (
+        <MatchScorecard
+          match={match}
+          state={matchState}
+          currentHole={hole}
+          onPickHole={setHole}
+        />
+      )}
+
+      {/* The beer card lives at the bottom of every matchup. */}
       <BeerScorecard match={match} state={matchState} beers={summary.beers} />
     </div>
   );

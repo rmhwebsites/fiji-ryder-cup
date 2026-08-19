@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { SEGMENT_META } from "@/lib/course";
-import type { BeerStatus, SegmentStatus } from "@/lib/scoring";
+import type { SegmentStatus } from "@/lib/scoring";
 import { TEAMS, type TeamId } from "@/lib/tournament";
 
 export const TEAM_STYLE: Record<
@@ -105,15 +105,6 @@ export function SegmentPill({
   );
 }
 
-const PACE_STYLE: Record<BeerStatus["pace"], string> = {
-  sending: "text-beer border-beer/45 bg-beer/12",
-  ahead: "text-beer border-beer/35 bg-beer/10",
-  "on-pace": "text-good border-good/35 bg-good/10",
-  behind: "text-orange-700 border-orange-400/50 bg-orange-400/12",
-  parched: "text-rose-700 border-rose-400/50 bg-rose-400/12",
-  idle: "text-mute border-line bg-ink-3/40",
-};
-
 export function BeerIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
@@ -136,23 +127,6 @@ export function BeerIcon({ className = "h-4 w-4" }: { className?: string }) {
         strokeLinecap="round"
       />
     </svg>
-  );
-}
-
-/**
- * Beer count for a pairing with its pace verdict. Before a group tees off the
- * verdict is dropped — ten cards all shouting "not started" is just noise.
- */
-export function BeerChip({ status }: { status: BeerStatus }) {
-  const idle = status.pace === "idle";
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-semibold ${PACE_STYLE[status.pace]}`}
-    >
-      <BeerIcon className="h-4 w-4" />
-      <span className="tabular">{status.total}</span>
-      {!idle && <span className="opacity-80">{status.label}</span>}
-    </span>
   );
 }
 

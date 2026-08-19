@@ -17,7 +17,7 @@ board move.
 | **Points** | Each nine is its own matchplay match worth **1 point**, or **½ each** if it finishes level |
 | **Total** | **20 points**, 10.5 wins the cup, 10–10 is a tie |
 | **Handicaps** | None, anywhere. Every match is straight gross and no handicap is shown in the app |
-| **Beers** | Each pairing drinks **18 over the round** — roughly one a hole. Logged per player, paced per pairing, flagged when a group falls off |
+| **Beers** | Each pairing drinks **18 over the round** — roughly one a hole. Logged per player, shown as a quiet status bar racing to 18 |
 
 Holes do not carry over. A halved hole is dead, and a nine where both sides win
 the same number of holes is halved.
@@ -101,15 +101,20 @@ Two tabs:
 - **Players** — the only screen that asks for the code. Unlock, claim your
   group, keep the card
 
-Every group's card opens on a full scorecard: par, both individual scores a
-side on the front nine, what each side posted, and who took each hole — a dot
-for a win, a blank square for a halve, with each side's holes won listed under
-the table lowest to highest. It scrolls sideways with the names pinned, and
-tapping a hole jumps the entry card below to it — the quickest way back to a
-hole somebody forgot to post. A level nine reads **TIE**.
+Each card on the board is a game row: the two pairings, the score of the nine
+being played — "Hole 13 · Back 9, 2 UP thru 3", flipping to level at the turn
+because each nine is its own match — and one thin beer bar. A level nine reads
+**TIE**.
+
+Tapping a group opens the full scorecard: par, both individual scores a side on
+the front nine, what each side posted, and who took each hole — a dot for a
+win, a blank square for a halve, with each side's holes won listed under the
+table lowest to highest. It scrolls sideways with the names pinned, and tapping
+a hole jumps the hole card to it. Spectators get the scorecard first; a player
+on their own card gets score entry first, because that is what they came to do.
 
 At the bottom of every matchup sits the beer card: the same 18 columns, one row
-per player plus the pairing total the 18-beer pace is measured against.
+per player plus the pairing total the 18-a-side target is measured against.
 
 Birdies and eagles fire a burst on entry, and whenever a nine is decided a
 banner drops on every phone watching — including a halved nine, where both

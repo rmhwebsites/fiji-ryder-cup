@@ -1,6 +1,6 @@
 "use client";
 
-import { parForHole, segmentForHole } from "@/lib/course";
+import { BEER_TARGET, parForHole, segmentForHole } from "@/lib/course";
 import {
   holeBeers,
   holeResult,
@@ -12,7 +12,7 @@ import {
   type MatchState,
 } from "@/lib/scoring";
 import { TEAMS, type Match, type TeamId } from "@/lib/tournament";
-import { BeerChip, BeerIcon, TEAM_STYLE } from "./ui";
+import { BeerIcon, TEAM_STYLE } from "./ui";
 
 const HOLES = Array.from({ length: 18 }, (_, i) => i + 1);
 const TEAM_ORDER: TeamId[] = ["badgers", "gators"];
@@ -276,11 +276,15 @@ export function BeerScorecard({
           <BeerIcon className="h-5 w-5 text-beer" />
           Beers
         </p>
-        <div className="flex gap-2">
-          {TEAM_ORDER.map((team) => (
-            <BeerChip key={team} status={beers[team]} />
-          ))}
-        </div>
+        <p className="text-base font-semibold tabular">
+          <span className="text-badger">{beers.badgers.total}</span>
+          <span className="text-mute"> – </span>
+          <span className="text-gator">{beers.gators.total}</span>
+          <span className="text-sm font-medium text-mute">
+            {" "}
+            of {BEER_TARGET} a side
+          </span>
+        </p>
       </div>
 
       <div className="overflow-x-auto">

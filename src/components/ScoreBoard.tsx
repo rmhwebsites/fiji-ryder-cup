@@ -48,7 +48,7 @@ export function ScoreBoard({ standings }: { standings: Standings }) {
 
   return (
     <section className="px-3 pt-2">
-      <div className="overflow-hidden rounded-3xl border border-line bg-gradient-to-b from-ink-2 to-ink-3 shadow-[0_12px_40px_-12px_rgba(13,22,38,0.18)]">
+      <div className="overflow-hidden rounded-2xl border border-line bg-ink-2">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 pt-5 pb-4">
           <TeamScore team="badgers" value={points.badgers} leading={leader === "badgers"} />
           <div className="pb-1 text-center">
