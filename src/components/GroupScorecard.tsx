@@ -41,7 +41,7 @@ export function GroupScorecard({
   matchNo: number;
   editable: boolean;
 }) {
-  const { standings, setScore, setBeers, ready } = useLive();
+  const { standings, setScore, setBeers, clearHole, ready } = useLive();
   const { celebrateScore } = useCelebrate();
 
   const [hole, setHole] = useState(1);
@@ -298,6 +298,64 @@ export function GroupScorecard({
 
       {/* The beer card lives at the bottom of every matchup. */}
       <BeerScorecard match={match} state={matchState} beers={summary.beers} />
+
+      {/* Last, and quiet, because it should be rare: the undo for a fat-
+          fingered hole. Wipes scores only — nobody re-counts their beers. */}
+      {editable && (
+        <ClearHoleButton hole={hole} onClear={() => clearHole(matchNo, hole)} />
+      )}
     </div>
+  );
+}
+
+/**
+ * Two taps to clear: the first arms it, the second (within a few seconds)
+ * wipes every score on the hole for both teams. The same tap-twice pattern a
+ * phone uses anywhere a dialog would be worse than the mistake.
+ */
+function ClearHoleButton({
+  hole,
+  onClear,
+}: {
+  hole: number;
+  onClear: () => void;
+}) {
+  const [armed, setArmed] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  // Moving to another hole stands the button down.
+  useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setArmed(false);
+    window.clearTimeout(timer.current);
+  }, [hole]);
+
+  const tap = () => {
+    if (!armed) {
+      setArmed(true);
+      timer.current = window.setTimeout(() => setArmed(false), 4000);
+      return;
+    }
+    window.clearTimeout(timer.current);
+    setArmed(false);
+    onClear();
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={tap}
+      className={`w-full rounded-xl border px-4 py-3 text-base font-semibold transition-colors active:scale-[0.99] ${
+        armed
+          ? "border-flag bg-flag/10 text-flag"
+          : "border-line bg-ink-2 text-mute"
+      }`}
+    >
+      {armed
+        ? `Wipe every score on hole ${hole}? Tap again`
+        : `Clear hole ${hole}`}
+    </button>
   );
 }

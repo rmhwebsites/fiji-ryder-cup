@@ -25,7 +25,8 @@ const beerId = (r: { matchNo: number; hole: number; team: TeamId; slot: number }
 
 type QueuedWrite =
   | { kind: "score"; row: ScoreRow }
-  | { kind: "beer"; row: BeerRow };
+  | { kind: "beer"; row: BeerRow }
+  | { kind: "clear-scores"; matchNo: number; hole: number };
 
 function readCache<T>(key: string): T[] {
   if (typeof window === "undefined") return [];
@@ -67,6 +68,8 @@ export interface Tournament {
     slot: number,
     beers: number,
   ) => void;
+  /** Wipe every score on one hole of one match, for both teams. */
+  clearHole: (matchNo: number, hole: number) => void;
 }
 
 /**
@@ -126,7 +129,13 @@ export function useTournament(): Tournament {
       while (queue.current.length > 0) {
         const write = queue.current[0];
         const { error } =
-          write.kind === "score"
+          write.kind === "clear-scores"
+            ? await supabase
+                .from("scores")
+                .delete()
+                .eq("match_no", write.matchNo)
+                .eq("hole", write.hole)
+            : write.kind === "score"
             ? await supabase.from("scores").upsert(
                 {
                   match_no: write.row.matchNo,
@@ -225,8 +234,26 @@ export function useTournament(): Tournament {
         "postgres_changes",
         { event: "*", schema: "public", table: "scores" },
         (payload) => {
+          if (payload.eventType === "DELETE") {
+            const old = payload.old as Record<string, number | string> | null;
+            if (!old || old.match_no === undefined) return;
+            const id = scoreId({
+              matchNo: old.match_no as number,
+              hole: old.hole as number,
+              team: old.team as TeamId,
+              slot: old.slot as number,
+            });
+            setScores((prev) => {
+              if (!prev.has(id)) return prev;
+              const next = new Map(prev);
+              next.delete(id);
+              writeCache(SCORE_CACHE, [...next.values()]);
+              return next;
+            });
+            return;
+          }
           const r = payload.new as Record<string, number | string> | null;
-          if (!r || payload.eventType === "DELETE") return;
+          if (!r) return;
           const row: ScoreRow = {
             matchNo: r.match_no as number,
             hole: r.hole as number,
@@ -343,6 +370,35 @@ export function useTournament(): Tournament {
     [flush, persistQueue],
   );
 
+  const clearHole = useCallback(
+    (matchNo: number, hole: number) => {
+      setScores((prev) => {
+        const next = new Map(prev);
+        for (const [id, row] of prev) {
+          if (row.matchNo === matchNo && row.hole === hole) next.delete(id);
+        }
+        writeCache(SCORE_CACHE, [...next.values()]);
+        return next;
+      });
+      if (isSupabaseConfigured) {
+        queue.current = [
+          ...queue.current.filter(
+            (w) =>
+              !(
+                w.kind === "score" &&
+                w.row.matchNo === matchNo &&
+                w.row.hole === hole
+              ),
+          ),
+          { kind: "clear-scores", matchNo, hole },
+        ];
+        persistQueue();
+        void flush();
+      }
+    },
+    [flush, persistQueue],
+  );
+
   const standings = useMemo(
     () => computeStandings(buildMatchStates([...scores.values()], [...beers.values()])),
     [scores, beers],
@@ -355,5 +411,6 @@ export function useTournament(): Tournament {
     ready,
     setScore,
     setBeers: setBeerCount,
+    clearHole,
   };
 }
