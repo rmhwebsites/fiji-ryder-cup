@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 
-import type { BeerStatus, MatchSummary } from "@/lib/scoring";
+import { SEGMENT_META } from "@/lib/course";
+import type { BeerStatus, MatchSummary, SegmentStatus } from "@/lib/scoring";
 import {
   getMatch,
   teeLabel,
@@ -10,7 +11,7 @@ import {
   type Match,
   type TeamId,
 } from "@/lib/tournament";
-import { BeerChip, SegmentPill, TEAM_STYLE } from "./ui";
+import { BeerChip, TEAM_STYLE } from "./ui";
 
 const surname = (name: string) => name.split(" ").slice(-1)[0];
 
@@ -100,14 +101,81 @@ export function MatchCard({
       </div>
 
       {summary.started ? (
-        <div className="flex gap-2">
-          <SegmentPill status={summary.front} />
-          <SegmentPill status={summary.back} />
-        </div>
+        <LiveStatus summary={summary} />
       ) : (
         <TeeTimeBar teeAt={match.teeAt} />
       )}
     </Link>
+  );
+}
+
+/**
+ * Where the group is and how the nine they are playing stands.
+ *
+ * The score shown is only ever the live nine. Each nine is its own match, so
+ * when a group walks off the 9th green the board flips to the back nine and
+ * reads all square again — the front nine's result shrinks to a settled chip
+ * rather than staying up as if it still carried.
+ */
+function LiveStatus({ summary }: { summary: MatchSummary }) {
+  const nine = summary.current;
+  const meta = SEGMENT_META[nine.segment];
+  const style = nine.leader ? TEAM_STYLE[nine.leader] : null;
+
+  return (
+    <div
+      className={`rounded-xl border px-3.5 py-3 ${
+        style ? `${style.bg} ${style.border}` : "border-line bg-ink-3/60"
+      }`}
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm font-semibold text-mute">
+          {summary.complete
+            ? "Final"
+            : `Hole ${summary.currentHole} · ${meta.label}`}
+        </p>
+        {/* A settled front nine stays visible as the chip it earned. */}
+        {nine.segment === "back" && (
+          <FinishedNineChip status={summary.front} />
+        )}
+      </div>
+
+      <div className="mt-0.5 flex items-baseline gap-2">
+        <p
+          className={`font-display text-2xl leading-tight font-extrabold tabular ${
+            style ? style.text : "text-chalk"
+          }`}
+        >
+          {nine.result}
+        </p>
+        <p className="min-w-0 truncate text-base font-semibold text-mute">
+          {nine.leader
+            ? TEAMS[nine.leader].shortName
+            : nine.thru === 0
+              ? `${meta.format} starts level`
+              : "Tied"}
+          {nine.started && nine.thru > 0 && !nine.finished && (
+            <span className="font-medium"> · thru {nine.thru}</span>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** "F9 3&2 Badgers" — a decided nine, banked and out of the way. */
+function FinishedNineChip({ status }: { status: SegmentStatus }) {
+  if (!status.finished) return null;
+  const style = status.leader ? TEAM_STYLE[status.leader] : null;
+  return (
+    <span
+      className={`shrink-0 rounded-full px-2 py-0.5 text-sm font-bold tabular ${
+        style ? `${style.bg} ${style.text}` : "bg-line text-mute"
+      }`}
+    >
+      F9 {status.result}
+      {status.leader ? ` ${TEAMS[status.leader].shortName}` : ""}
+    </span>
   );
 }
 

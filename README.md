@@ -17,7 +17,7 @@ board move.
 | **Points** | Each nine is its own matchplay match worth **1 point**, or **½ each** if it finishes level |
 | **Total** | **20 points**, 10.5 wins the cup, 10–10 is a tie |
 | **Handicaps** | None, anywhere. Every match is straight gross and no handicap is shown in the app |
-| **Beers** | Each pairing drinks **18 over the round** — roughly one a hole. Tracked live, flagged when a group falls off pace |
+| **Beers** | Each pairing drinks **18 over the round** — roughly one a hole. Logged per player, paced per pairing, flagged when a group falls off |
 
 Holes do not carry over. A halved hole is dead, and a nine where both sides win
 the same number of holes is halved.
@@ -92,7 +92,7 @@ think about it — keep tapping.
 
 ## Screens
 
-Three tabs:
+Two tabs:
 
 - **Live** — the cup score, the run to 10.5, the beer race, and all 10 groups
   split into on the course / yet to tee off / in the clubhouse. A group shows
@@ -100,12 +100,16 @@ Three tabs:
   Tap any group for its full card — read-only, open to everyone
 - **Players** — the only screen that asks for the code. Unlock, claim your
   group, keep the card
-- **Teams** — the draw, group by group
 
 Every group's card opens on a full scorecard: par, both individual scores a
-side on the front nine, what each side posted, and who took each hole. It
-scrolls sideways with the names pinned, and tapping a hole jumps the entry card
-below to it — the quickest way back to a hole somebody forgot to post.
+side on the front nine, what each side posted, and who took each hole — a dot
+for a win, a blank square for a halve, with each side's holes won listed under
+the table lowest to highest. It scrolls sideways with the names pinned, and
+tapping a hole jumps the entry card below to it — the quickest way back to a
+hole somebody forgot to post. A level nine reads **TIE**.
+
+At the bottom of every matchup sits the beer card: the same 18 columns, one row
+per player plus the pairing total the 18-beer pace is measured against.
 
 Birdies and eagles fire a burst on entry, and whenever a nine is decided a
 banner drops on every phone watching — including a halved nine, where both

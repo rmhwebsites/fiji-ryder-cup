@@ -44,7 +44,7 @@ export function ScoreBoard({ standings }: { standings: Standings }) {
           ? "Cup tied 10–10"
           : leader
             ? `${TEAMS[leader].shortName} lead · ${fmt(POINTS_TO_WIN - points[leader])} to clinch`
-            : "All square";
+            : "Tied";
 
   return (
     <section className="px-3 pt-2">

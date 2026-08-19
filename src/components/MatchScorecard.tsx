@@ -1,9 +1,18 @@
 "use client";
 
 import { parForHole, segmentForHole } from "@/lib/course";
-import { holeResult, playerScore, teamHoleScore, type MatchState } from "@/lib/scoring";
+import {
+  holeBeers,
+  holeResult,
+  playerBeers,
+  playerHoleBeers,
+  playerScore,
+  teamHoleScore,
+  type BeerStatus,
+  type MatchState,
+} from "@/lib/scoring";
 import { TEAMS, type Match, type TeamId } from "@/lib/tournament";
-import { TEAM_STYLE } from "./ui";
+import { BeerChip, BeerIcon, TEAM_STYLE } from "./ui";
 
 const HOLES = Array.from({ length: 18 }, (_, i) => i + 1);
 const TEAM_ORDER: TeamId[] = ["badgers", "gators"];
@@ -91,10 +100,10 @@ export function MatchScorecard({
                 const res = holeResult(state, h);
                 return (
                   <Td key={h} turn={h === 10} current={h === currentHole}>
-                    {res === null ? (
+                    {/* A halved hole is dead, so its square stays blank —
+                        only a won hole earns a mark. */}
+                    {res === null || res === "halve" ? (
                       <Blank />
-                    ) : res === "halve" ? (
-                      <span className="text-sm font-bold text-mute">½</span>
                     ) : (
                       <span
                         className={`inline-block h-3 w-3 rounded-full ${
@@ -110,6 +119,32 @@ export function MatchScorecard({
           </tbody>
         </table>
       </div>
+
+      <HolesWonList state={state} />
+    </div>
+  );
+}
+
+/** Every hole each side has won so far, lowest to highest. */
+function HolesWonList({ state }: { state: MatchState }) {
+  const won: Record<TeamId, number[]> = { badgers: [], gators: [] };
+  for (const h of HOLES) {
+    const res = holeResult(state, h);
+    if (res === "badgers" || res === "gators") won[res].push(h);
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-1.5 border-t border-line px-4 py-3 sm:grid-cols-2 sm:gap-3">
+      {TEAM_ORDER.map((team) => (
+        <p key={team} className="flex items-baseline gap-2 text-base">
+          <span className={`shrink-0 font-bold ${TEAM_STYLE[team].text}`}>
+            {TEAMS[team].shortName}
+          </span>
+          <span className="min-w-0 font-semibold tabular text-chalk">
+            {won[team].length > 0 ? won[team].join(", ") : "—"}
+          </span>
+        </p>
+      ))}
     </div>
   );
 }
@@ -208,11 +243,141 @@ function Td({
 }) {
   return (
     <td
-      className={`h-9 w-11 ${muted ? "text-sm text-mute" : "text-chalk"} ${
+      className={`h-9 w-11 min-w-11 ${muted ? "text-sm text-mute" : "text-chalk"} ${
         turn ? "border-l-2 border-line" : ""
       } ${current ? "bg-chalk/8" : ""}`}
     >
       {children}
     </td>
+  );
+}
+
+/**
+ * The beer card — the second scorecard of the day, kept at the bottom of every
+ * matchup because it is the one people check after the golf is settled.
+ *
+ * Same bones as the match scorecard: names pinned, a column per hole, the
+ * border at the turn. A zero-beer hole renders as a dot rather than a 0 so the
+ * holes where something happened stand out.
+ */
+export function BeerScorecard({
+  match,
+  state,
+  beers,
+}: {
+  match: Match;
+  state: MatchState;
+  beers: Record<TeamId, BeerStatus>;
+}) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-line bg-ink-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
+        <p className="flex items-center gap-2 text-base font-bold text-chalk">
+          <BeerIcon className="h-5 w-5 text-beer" />
+          Beers
+        </p>
+        <div className="flex gap-2">
+          {TEAM_ORDER.map((team) => (
+            <BeerChip key={team} status={beers[team]} />
+          ))}
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse text-center text-base tabular">
+          <thead>
+            <tr className="bg-ink-3/60">
+              <Th sticky muted>
+                Hole
+              </Th>
+              {HOLES.map((h) => (
+                <Td key={h} muted turn={h === 10}>
+                  {h}
+                </Td>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {TEAM_ORDER.map((team) => (
+              <BeerTeamRows
+                key={team}
+                team={team}
+                match={match}
+                state={state}
+                total={beers[team].total}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/** One pairing on the beer card: each player's row, then the pairing total. */
+function BeerTeamRows({
+  team,
+  match,
+  state,
+  total,
+}: {
+  team: TeamId;
+  match: Match;
+  state: MatchState;
+  total: number;
+}) {
+  const style = TEAM_STYLE[team];
+
+  return (
+    <>
+      {[1, 2].map((slot) => (
+        <tr key={slot} className="border-t border-line/70">
+          <Th sticky>
+            <span className="font-medium text-chalk">
+              {surname(match[team][slot - 1].name)}
+            </span>
+            <span className="ml-1.5 text-sm font-semibold text-beer">
+              {playerBeers(state, team, slot)}
+            </span>
+          </Th>
+          {HOLES.map((h) => {
+            const n = playerHoleBeers(state, team, h, slot);
+            return (
+              <Td key={h} turn={h === 10}>
+                {n > 0 ? (
+                  <span className="font-bold text-beer">{n}</span>
+                ) : (
+                  <Blank />
+                )}
+              </Td>
+            );
+          })}
+        </tr>
+      ))}
+
+      {/* The pairing total is what the 18-beer pace is measured against, and
+          it can exceed the two player rows — beers logged before the per-player
+          split still count here. */}
+      <tr className={`border-t border-line ${style.bg}`}>
+        <Th sticky>
+          <span className={`font-bold ${style.text}`}>
+            {TEAMS[team].shortName}
+          </span>
+          <span className="ml-1.5 text-sm font-semibold text-beer">{total}</span>
+        </Th>
+        {HOLES.map((h) => {
+          const n = holeBeers(state, team, h);
+          return (
+            <Td key={h} turn={h === 10}>
+              {n > 0 ? (
+                <span className={`font-bold ${style.text}`}>{n}</span>
+              ) : (
+                <Blank />
+              )}
+            </Td>
+          );
+        })}
+      </tr>
+    </>
   );
 }

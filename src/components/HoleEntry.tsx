@@ -131,6 +131,7 @@ export function BeerCounter({
   label,
   holeCount,
   total,
+  target,
   accent,
   disabled,
   onChange,
@@ -138,6 +139,8 @@ export function BeerCounter({
   label: string;
   holeCount: number;
   total: number;
+  /** Pace target to show behind the total, e.g. 18 for a pairing. */
+  target?: number;
   accent: string;
   disabled?: boolean;
   onChange: (next: number) => void;
@@ -147,7 +150,8 @@ export function BeerCounter({
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <p className={`truncate text-sm font-bold ${accent}`}>{label}</p>
         <p className="shrink-0 text-sm font-semibold text-mute">
-          <span className="tabular text-beer">{total}</span>/18
+          <span className="tabular text-beer">{total}</span>
+          {target ? `/${target}` : " today"}
         </p>
       </div>
 

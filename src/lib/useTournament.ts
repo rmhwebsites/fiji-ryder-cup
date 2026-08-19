@@ -20,8 +20,8 @@ const QUEUE_CACHE = "frc:queue";
 
 const scoreId = (r: { matchNo: number; hole: number; team: TeamId; slot: number }) =>
   `${r.matchNo}:${r.hole}:${r.team}:${r.slot}`;
-const beerId = (r: { matchNo: number; hole: number; team: TeamId }) =>
-  `${r.matchNo}:${r.hole}:${r.team}`;
+const beerId = (r: { matchNo: number; hole: number; team: TeamId; slot: number }) =>
+  `${r.matchNo}:${r.hole}:${r.team}:${r.slot}`;
 
 type QueuedWrite =
   | { kind: "score"; row: ScoreRow }
@@ -64,6 +64,7 @@ export interface Tournament {
     matchNo: number,
     hole: number,
     team: TeamId,
+    slot: number,
     beers: number,
   ) => void;
 }
@@ -142,10 +143,11 @@ export function useTournament(): Tournament {
                   match_no: write.row.matchNo,
                   hole: write.row.hole,
                   team: write.row.team,
+                  slot: write.row.slot,
                   beers: write.row.beers,
                   updated_at: new Date().toISOString(),
                 },
-                { onConflict: "match_no,hole,team" },
+                { onConflict: "match_no,hole,team,slot" },
               );
 
         if (error) {
@@ -171,7 +173,7 @@ export function useTournament(): Tournament {
     const load = async () => {
       const [scoreRes, beerRes] = await Promise.all([
         supabase.from("scores").select("match_no,hole,team,slot,strokes"),
-        supabase.from("beers").select("match_no,hole,team,beers"),
+        supabase.from("beers").select("match_no,hole,team,slot,beers"),
       ]);
       if (cancelled) return;
 
@@ -199,6 +201,8 @@ export function useTournament(): Tournament {
           matchNo: r.match_no,
           hole: r.hole,
           team: r.team as TeamId,
+          // Rows written before beers were per-player have no slot.
+          slot: r.slot ?? 0,
           beers: r.beers,
         };
         nextBeers.set(beerId(row), row);
@@ -247,6 +251,7 @@ export function useTournament(): Tournament {
             matchNo: r.match_no as number,
             hole: r.hole as number,
             team: r.team as TeamId,
+            slot: (r.slot as number) ?? 0,
             beers: r.beers as number,
           };
           setBeers((prev) => {
@@ -317,8 +322,8 @@ export function useTournament(): Tournament {
   );
 
   const setBeerCount = useCallback(
-    (matchNo: number, hole: number, team: TeamId, count: number) => {
-      const row: BeerRow = { matchNo, hole, team, beers: Math.max(0, count) };
+    (matchNo: number, hole: number, team: TeamId, slot: number, count: number) => {
+      const row: BeerRow = { matchNo, hole, team, slot, beers: Math.max(0, count) };
       setBeers((prev) => {
         const next = new Map(prev).set(beerId(row), row);
         writeCache(BEER_CACHE, [...next.values()]);

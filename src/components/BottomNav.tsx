@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 /**
- * Three tabs.
+ * Two tabs.
  *
  * The board (Live) is where everyone lives — the leaderboard and all ten
- * groups on one screen, readable without a code. Players is the only place the
- * scoring code exists: unlock once, claim your group once, keep the card.
- * Teams is the draw.
+ * groups on one screen, readable without a code, and every card already names
+ * its four players, which is why a separate Teams tab had nothing left to say.
+ * Players is the only place the scoring code exists: unlock once, claim your
+ * group once, keep the card.
  */
 const TABS = [
   { href: "/", label: "Live", icon: "M3 12h4l3 8 4-16 3 8h4" },
@@ -17,11 +18,6 @@ const TABS = [
     href: "/players",
     label: "Players",
     icon: "M12 15a4 4 0 100-8 4 4 0 000 8zM4.5 20a7.5 7.5 0 0115 0",
-  },
-  {
-    href: "/teams",
-    label: "Teams",
-    icon: "M9 13a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM2 19a7 7 0 0114 0M17.5 12.5a3 3 0 10-2-5.2M22 18a5 5 0 00-3.5-4.8",
   },
 ] as const;
 

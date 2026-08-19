@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   beerStatus,
   buildMatchStates,
+  playerBeers,
+  playerHoleBeers,
+  holeBeers,
+  teamBeers,
   computeStandings,
   emptyMatchState,
   holeResult,
@@ -149,7 +153,7 @@ describe("segmentStatus", () => {
     const status = segmentStatus(s, "front");
     expect(status.finished).toBe(true);
     expect(status.leader).toBeNull();
-    expect(status.result).toBe("AS");
+    expect(status.result).toBe("TIE");
     expect(status.points).toEqual({ badgers: 0.5, gators: 0.5 });
   });
 
@@ -175,7 +179,7 @@ describe("segmentStatus", () => {
   it("is untouched before any score lands", () => {
     const status = segmentStatus(emptyMatchState(), "front");
     expect(status.started).toBe(false);
-    expect(status.result).toBe("AS");
+    expect(status.result).toBe("TIE");
     expect(status.finished).toBe(false);
   });
 });
@@ -226,9 +230,11 @@ describe("computeStandings", () => {
 
     winFront(1, "badgers");
     winFront(2, "gators");
-    beers.push({ matchNo: 1, hole: 1, team: "badgers", beers: 3 });
-    beers.push({ matchNo: 1, hole: 2, team: "badgers", beers: 2 });
-    beers.push({ matchNo: 2, hole: 1, team: "gators", beers: 4 });
+    beers.push({ matchNo: 1, hole: 1, team: "badgers", slot: 1, beers: 2 });
+    beers.push({ matchNo: 1, hole: 1, team: "badgers", slot: 2, beers: 1 });
+    // A pre-migration row with no player attached still counts for the team.
+    beers.push({ matchNo: 1, hole: 2, team: "badgers", slot: 0, beers: 2 });
+    beers.push({ matchNo: 2, hole: 1, team: "gators", slot: 1, beers: 4 });
 
     const standings = computeStandings(buildMatchStates(scores, beers));
     expect(standings.points).toEqual({ badgers: 1, gators: 1 });
@@ -267,7 +273,7 @@ describe("no carryover — halved holes just die", () => {
     const status = segmentStatus(s, "front");
     expect(status.finished).toBe(true);
     expect(status.leader).toBeNull();
-    expect(status.result).toBe("AS");
+    expect(status.result).toBe("TIE");
     expect(status.points).toEqual({ badgers: 0.5, gators: 0.5 });
   });
 
@@ -319,5 +325,102 @@ describe("cup arithmetic", () => {
     expect(standings.points).toEqual({ badgers: 10, gators: 10 });
     expect(standings.segmentsComplete).toBe(20);
     expect(standings.segmentsRemaining).toBe(0);
+  });
+});
+
+describe("where the group is right now", () => {
+  it("starts on hole 1 with an empty card", () => {
+    const m = summarizeMatch(1, emptyMatchState());
+    expect(m.currentHole).toBe(1);
+    expect(m.currentSegment).toBe("front");
+    expect(m.current.result).toBe("TIE");
+  });
+
+  it("points at the next hole still missing a score", () => {
+    const s = emptyMatchState();
+    setFront(s, 1, [4, 5], [5, 5]);
+    setFront(s, 2, [4, 4], [4, 4]);
+    const m = summarizeMatch(1, s);
+    expect(m.currentHole).toBe(3);
+    expect(m.currentSegment).toBe("front");
+  });
+
+  it("resets the score at the turn", () => {
+    const s = emptyMatchState();
+    // Badgers win 1-3 then halve everything: the front nine closes out 3&2
+    // after the 7th, and the group plays 8 and 9 for pride (and beers).
+    for (const hole of [1, 2, 3]) setFront(s, hole, [3, 4], [5, 5]);
+    for (const hole of [4, 5, 6, 7, 8, 9]) setFront(s, hole, [4, 4], [4, 4]);
+
+    const atTurn = summarizeMatch(1, s);
+    expect(atTurn.front.result).toBe("3&2");
+    expect(atTurn.front.finished).toBe(true);
+
+    // Stepping onto 10 swaps the live score to the back nine, which is a new
+    // match and therefore all square — the front nine is banked, not carried.
+    expect(atTurn.currentHole).toBe(10);
+    expect(atTurn.currentSegment).toBe("back");
+    expect(atTurn.current.result).toBe("TIE");
+    expect(atTurn.current.leader).toBeNull();
+    expect(atTurn.current.thru).toBe(0);
+
+    // And the front nine's point is still banked while the back is level.
+    expect(atTurn.points.badgers).toBe(1);
+    expect(atTurn.points.gators).toBe(0);
+  });
+
+  it("tracks the back nine independently once it is under way", () => {
+    const s = emptyMatchState();
+    for (const hole of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+      setFront(s, hole, [4, 4], [4, 4]);
+    }
+    setBack(s, 10, 3, 5);
+    setBack(s, 11, 3, 5);
+
+    const m = summarizeMatch(1, s);
+    expect(m.currentSegment).toBe("back");
+    expect(m.currentHole).toBe(12);
+    expect(m.current.result).toBe("2 UP");
+    expect(m.current.leader).toBe("badgers");
+    expect(m.current.thru).toBe(2);
+  });
+
+  it("sits on 18 rather than a 19th hole when the card is full", () => {
+    const s = emptyMatchState();
+    for (const hole of [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+      setFront(s, hole, [4, 4], [4, 4]);
+    }
+    for (let hole = 10; hole <= 18; hole++) setBack(s, hole, 4, 4);
+
+    const m = summarizeMatch(1, s);
+    expect(m.currentHole).toBe(18);
+    expect(m.complete).toBe(true);
+  });
+});
+
+describe("beers per player", () => {
+  it("splits a hole between the pairing and still totals the team", () => {
+    const state = buildMatchStates(
+      [],
+      [
+        { matchNo: 1, hole: 3, team: "badgers", slot: 1, beers: 2 },
+        { matchNo: 1, hole: 3, team: "badgers", slot: 2, beers: 1 },
+        { matchNo: 1, hole: 4, team: "badgers", slot: 2, beers: 1 },
+        // Legacy row, written before beers had players.
+        { matchNo: 1, hole: 5, team: "badgers", slot: 0, beers: 3 },
+      ],
+    ).get(1)!;
+
+    expect(playerHoleBeers(state, "badgers", 3, 1)).toBe(2);
+    expect(playerHoleBeers(state, "badgers", 3, 2)).toBe(1);
+    expect(holeBeers(state, "badgers", 3)).toBe(3);
+
+    expect(playerBeers(state, "badgers", 1)).toBe(2);
+    expect(playerBeers(state, "badgers", 2)).toBe(2);
+
+    // The legacy hole counts for the pairing but for neither player.
+    expect(holeBeers(state, "badgers", 5)).toBe(3);
+    expect(playerBeers(state, "badgers", 1) + playerBeers(state, "badgers", 2)).toBe(4);
+    expect(teamBeers(state, "badgers")).toBe(7);
   });
 });

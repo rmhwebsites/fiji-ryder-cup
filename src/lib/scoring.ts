@@ -34,11 +34,18 @@ export interface ScoreRow {
   strokes: number;
 }
 
-/** Beers a pairing logged on a given hole. */
+/**
+ * Beers one player logged on one hole.
+ *
+ * `slot` is 1 or 2, the same player positions the scores use. 0 is a legacy
+ * team-level entry from before beers were tracked per player; it still counts
+ * toward the pairing, it just belongs to nobody in particular.
+ */
 export interface BeerRow {
   matchNo: number;
   hole: number;
   team: TeamId;
+  slot: number;
   beers: number;
 }
 
@@ -46,14 +53,15 @@ export interface BeerRow {
 export interface MatchState {
   /** `${team}:${hole}:${slot}` -> strokes */
   strokes: Map<string, number>;
-  /** `${team}:${hole}` -> beers */
+  /** `${team}:${hole}:${slot}` -> beers */
   beers: Map<string, number>;
 }
 
 export const strokeKey = (team: TeamId, hole: number, slot: number) =>
   `${team}:${hole}:${slot}`;
 
-export const beerKey = (team: TeamId, hole: number) => `${team}:${hole}`;
+export const beerKey = (team: TeamId, hole: number, slot: number) =>
+  `${team}:${hole}:${slot}`;
 
 export function emptyMatchState(): MatchState {
   return { strokes: new Map(), beers: new Map() };
@@ -75,7 +83,7 @@ export function buildMatchStates(
   for (const row of beers) {
     const state = states.get(row.matchNo);
     if (!state) continue;
-    state.beers.set(beerKey(row.team, row.hole), row.beers);
+    state.beers.set(beerKey(row.team, row.hole, row.slot ?? 0), row.beers);
   }
   return states;
 }
@@ -142,7 +150,7 @@ export interface SegmentStatus {
   closedOut: boolean;
   /** Whether a single score has been entered yet. */
   started: boolean;
-  /** "3&2", "1 UP", "AS" when done; "2 UP" or "AS" while live. */
+  /** "3&2", "1 UP", "TIE" when done; "2 UP" or "TIE" while live. */
   result: string;
   /** Points earned so far — zeroes until the nine is finished. */
   points: Record<TeamId, number>;
@@ -205,7 +213,7 @@ export function segmentStatus(
 
   let result: string;
   if (up === 0) {
-    result = "AS";
+    result = "TIE";
   } else if (finished && closedOut) {
     result = `${up}&${holes.length - decidedAfter}`;
   } else {
@@ -267,13 +275,40 @@ export function teamBeers(state: MatchState, team: TeamId): number {
   return total;
 }
 
-/** Beers a pairing logged on one hole. */
+/** Beers a pairing logged on one hole — both players plus any legacy rows. */
 export function holeBeers(
   state: MatchState,
   team: TeamId,
   hole: number,
 ): number {
-  return state.beers.get(beerKey(team, hole)) ?? 0;
+  let total = 0;
+  for (const slot of [0, 1, 2]) {
+    total += state.beers.get(beerKey(team, hole, slot)) ?? 0;
+  }
+  return total;
+}
+
+/** Beers one player logged on one hole. */
+export function playerHoleBeers(
+  state: MatchState,
+  team: TeamId,
+  hole: number,
+  slot: number,
+): number {
+  return state.beers.get(beerKey(team, hole, slot)) ?? 0;
+}
+
+/** One player's beers across the whole round. */
+export function playerBeers(
+  state: MatchState,
+  team: TeamId,
+  slot: number,
+): number {
+  let total = 0;
+  for (let hole = 1; hole <= 18; hole++) {
+    total += playerHoleBeers(state, team, hole, slot);
+  }
+  return total;
 }
 
 /**
@@ -312,6 +347,17 @@ export interface MatchSummary {
   back: SegmentStatus;
   /** Holes completed across all 18. */
   holesPlayed: number;
+  /**
+   * The hole the group is on: the first one still missing a result, or 18 once
+   * the card is full. This is also what makes the score reset at the turn —
+   * the moment hole 9 is in, this points at 10 and `current` becomes the back
+   * nine, which starts all square.
+   */
+  currentHole: number;
+  /** Which nine `currentHole` belongs to. */
+  currentSegment: Segment;
+  /** The nine being played right now — the score that should be on the board. */
+  current: SegmentStatus;
   beers: Record<TeamId, BeerStatus>;
   points: Record<TeamId, number>;
   /** Any score entered at all. */
@@ -335,6 +381,18 @@ export function summarizeMatch(
     if (holeResult(state, hole) !== null) holesPlayed += 1;
   }
 
+  // The first hole nobody has posted yet. Falls through to 18 on a full card,
+  // so a finished group reads as sitting on the last hole rather than jumping
+  // to a 19th that does not exist.
+  let currentHole = 18;
+  for (let hole = 1; hole <= 18; hole++) {
+    if (holeResult(state, hole) === null) {
+      currentHole = hole;
+      break;
+    }
+  }
+  const currentSegment = segmentForHole(currentHole);
+
   const beers = {
     badgers: beerStatus(teamBeers(state, "badgers"), holesPlayed),
     gators: beerStatus(teamBeers(state, "gators"), holesPlayed),
@@ -346,6 +404,9 @@ export function summarizeMatch(
     front,
     back,
     holesPlayed,
+    currentHole,
+    currentSegment,
+    current: currentSegment === "front" ? front : back,
     beers,
     points: {
       badgers: front.points.badgers + back.points.badgers,

@@ -20,16 +20,38 @@ create table if not exists public.scores (
 );
 
 -- ─────────────────────────────────────────────────────────────────────────
--- Beers, logged per pairing per hole. 18 over the round is the target.
+-- Beers, logged per player per hole. 18 over the round per pairing is the
+-- target. slot 1 and 2 are the pairing's two players, matching scores; slot 0
+-- is a legacy team-level row from before beers were per player.
 -- ─────────────────────────────────────────────────────────────────────────
 create table if not exists public.beers (
   match_no   smallint    not null check (match_no between 1 and 10),
   hole       smallint    not null check (hole between 1 and 18),
   team       text        not null check (team in ('badgers', 'gators')),
+  slot       smallint    not null default 0 check (slot between 0 and 2),
   beers      smallint    not null check (beers between 0 and 30),
   updated_at timestamptz not null default now(),
-  primary key (match_no, hole, team)
+  primary key (match_no, hole, team, slot)
 );
+
+-- Upgrade a beers table created before the slot column existed. Both steps
+-- are no-ops on a fresh install, keeping the file re-runnable.
+alter table public.beers
+  add column if not exists slot smallint not null default 0
+  check (slot between 0 and 2);
+
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.key_column_usage
+    where table_schema = 'public' and table_name = 'beers'
+      and constraint_name = 'beers_pkey' and column_name = 'slot'
+  ) then
+    alter table public.beers drop constraint beers_pkey;
+    alter table public.beers
+      add constraint beers_pkey primary key (match_no, hole, team, slot);
+  end if;
+end $$;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- Access.

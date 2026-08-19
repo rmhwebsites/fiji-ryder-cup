@@ -10,17 +10,18 @@ import {
   type Segment,
 } from "@/lib/course";
 import {
-  holeBeers,
   holeResult,
+  playerBeers,
+  playerHoleBeers,
   playerScore,
   teamHoleScore,
 } from "@/lib/scoring";
 import { getMatch, TEAMS, type TeamId } from "@/lib/tournament";
 import { useCelebrate } from "@/components/Celebrations";
 import { BeerCounter, ScoreStepper } from "@/components/HoleEntry";
-import { MatchScorecard } from "@/components/MatchScorecard";
+import { BeerScorecard, MatchScorecard } from "@/components/MatchScorecard";
 import { useLive } from "@/components/TournamentProvider";
-import { BeerChip, SegmentPill, TEAM_STYLE } from "@/components/ui";
+import { SegmentPill, TEAM_STYLE } from "@/components/ui";
 
 const TEAM_ORDER: TeamId[] = ["badgers", "gators"];
 const surname = (n: string) => n.split(" ").slice(-1)[0];
@@ -40,11 +41,26 @@ export function GroupScorecard({
   matchNo: number;
   editable: boolean;
 }) {
-  const { standings, setScore, setBeers } = useLive();
+  const { standings, setScore, setBeers, ready } = useLive();
   const { celebrateScore } = useCelebrate();
 
   const [hole, setHole] = useState(1);
   const holeStrip = useRef<HTMLDivElement>(null);
+
+  // Open on the hole the group is actually playing, once the data has landed.
+  // One jump only — after that the hole belongs to whoever is tapping, and a
+  // realtime score arriving mid-look must not yank the card out from under
+  // them.
+  const jumped = useRef(false);
+  useEffect(() => {
+    if (!ready || jumped.current) return;
+    jumped.current = true;
+    const current = standings.matches.find(
+      (m) => m.matchNo === matchNo,
+    )?.currentHole;
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    if (current && current > 1) setHole(current);
+  }, [ready, standings, matchNo]);
 
   // Keep the hole you are on inside the strip — otherwise the back nine sits
   // off-screen and you have to swipe to it every single time.
@@ -231,59 +247,46 @@ export function GroupScorecard({
             </p>
           </div>
 
-          {/* Beers */}
-          <div className="px-4 py-4">
-            <p className="mb-2.5 text-base font-bold text-chalk">
-              Beers on this hole
-            </p>
-            {editable ? (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  {TEAM_ORDER.map((team) => (
-                    <BeerCounter
-                      key={team}
-                      label={TEAMS[team].shortName}
-                      accent={TEAM_STYLE[team].text}
-                      holeCount={holeBeers(matchState, team, hole)}
-                      total={summary.beers[team].total}
-                      onChange={(next) => setBeers(matchNo, hole, team, next)}
-                    />
-                  ))}
-                </div>
-                <div className="mt-3 flex justify-between gap-2">
-                  {TEAM_ORDER.map((team) => (
-                    <BeerChip key={team} status={summary.beers[team]} />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
+          {/* Beers on the current hole — entry only. Reading them happens on
+              the beer card below, which shows the whole round at once. */}
+          {editable && (
+            <div className="px-4 py-4">
+              <p className="mb-2.5 text-base font-bold text-chalk">
+                Beers on this hole
+              </p>
+              <div className="space-y-3">
                 {TEAM_ORDER.map((team) => (
-                  <div
-                    key={team}
-                    className="rounded-xl border border-line bg-ink-3/50 p-3"
-                  >
+                  <div key={team}>
                     <p
-                      className={`mb-1.5 text-sm font-bold ${TEAM_STYLE[team].text}`}
+                      className={`mb-2 text-sm font-bold ${TEAM_STYLE[team].text}`}
                     >
                       {TEAMS[team].shortName}
                     </p>
-                    <p className="font-display text-xl font-extrabold tabular text-chalk">
-                      {holeBeers(matchState, team, hole)}
-                      <span className="ml-1.5 text-sm font-medium text-mute">
-                        this hole
-                      </span>
-                    </p>
-                    <div className="mt-2">
-                      <BeerChip status={summary.beers[team]} />
+                    <div className="grid grid-cols-2 gap-3">
+                      {[1, 2].map((slot) => (
+                        <BeerCounter
+                          key={slot}
+                          label={surname(match[team][slot - 1].name)}
+                          accent="text-chalk"
+                          holeCount={playerHoleBeers(matchState, team, hole, slot)}
+                          total={playerBeers(matchState, team, slot)}
+                          onChange={(next) =>
+                            setBeers(matchNo, hole, team, slot, next)
+                          }
+                        />
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* The beer card lives at the bottom of every matchup, spectator or
+          scorer alike — the full 18 with the pace verdicts on top. */}
+      <BeerScorecard match={match} state={matchState} beers={summary.beers} />
     </div>
   );
 }
