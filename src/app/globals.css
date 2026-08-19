@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+/* ───────────────────────────────────────────────────────────────────────
+   FIJI RYDER CUP — broadcast-dark theme, built mobile first.
+   ─────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-ink: #07090c;
+  --color-ink-2: #0d1117;
+  --color-ink-3: #151b24;
+  --color-line: #222c39;
+  --color-chalk: #f4f7fb;
+  --color-mute: #8494a8;
+
+  /* Honey Badgers — honey gold */
+  --color-badger: #f0a92b;
+  --color-badger-dim: #6a4a12;
+  --color-badger-glow: #ffc861;
+
+  /* Gators — swamp green */
+  --color-gator: #16b46b;
+  --color-gator-dim: #0d5233;
+  --color-gator-glow: #3ee89a;
+
+  --color-beer: #ffb42e;
+  --color-flag: #e8443a;
+
+  /* System stacks — no webfont round trip, so the board paints instantly on
+     a phone clinging to one bar of signal. */
+  --font-display: ui-sans-serif, -apple-system, "SF Pro Display", "Segoe UI",
+    system-ui, "Helvetica Neue", sans-serif;
+  --font-sans: ui-sans-serif, -apple-system, "SF Pro Text", "Segoe UI",
+    system-ui, "Helvetica Neue", sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  /* Stop iOS Safari inflating the numbers on the scorecard in landscape. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-chalk);
+  font-family: var(--font-sans);
+  /* Room for the fixed bottom bar plus the iPhone home indicator. */
+  padding-bottom: env(safe-area-inset-bottom);
+  overscroll-behavior-y: none;
+}
+
+/* Kill the spinner arrows — the steppers do the work. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Big tap targets shouldn't flash blue or get selected mid-round. */
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Score celebrations ────────────────────────────────────────────────── */
+
+@keyframes pop-in {
+  0% { transform: scale(0.4) translateY(12px); opacity: 0; }
+  55% { transform: scale(1.12) translateY(0); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes rise-fade {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: translateY(-64px) scale(1.25); opacity: 0; }
+}
+
+@keyframes ring-burst {
+  0% { transform: scale(0.3); opacity: 0.9; border-width: 6px; }
+  100% { transform: scale(2.6); opacity: 0; border-width: 1px; }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(var(--drift, 0), 108vh, 0) rotate(var(--spin, 720deg)); opacity: 0.9; }
+}
+
+@keyframes sweep-in {
+  0% { transform: translateX(-100%) skewX(-12deg); opacity: 0; }
+  100% { transform: translateX(0) skewX(-12deg); opacity: 1; }
+}
+
+@keyframes banner-in {
+  0% { transform: translateY(-120%); opacity: 0; }
+  12% { transform: translateY(0); opacity: 1; }
+  85% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-120%); opacity: 0; }
+}
+
+@keyframes shine {
+  0% { background-position: -180% 0; }
+  100% { background-position: 180% 0; }
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.82); }
+}
+
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes fizz {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(-26px) scale(1); opacity: 0; }
+}
+
+.anim-pop { animation: pop-in 420ms cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.anim-rise { animation: rise-fade 1100ms ease-out both; }
+.anim-ring { animation: ring-burst 900ms ease-out both; }
+.anim-sweep { animation: sweep-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-banner { animation: banner-in 3400ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.anim-live { animation: live-pulse 1.8s ease-in-out infinite; }
+.anim-bar { animation: bar-grow 700ms cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: left; }
+.anim-fizz { animation: fizz 900ms ease-out both; }
+
+.anim-shine {
+  background-size: 220% 100%;
+  animation: shine 2.4s linear infinite;
+}
+
+/* Respect the setting — the board still updates, it just stops moving. */
+@media (prefers-reduced-motion: reduce) {
+  .anim-pop,
+  .anim-rise,
+  .anim-ring,
+  .anim-sweep,
+  .anim-banner,
+  .anim-live,
+  .anim-bar,
+  .anim-fizz,
+  .anim-shine,
+  .confetti-piece {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .anim-banner { animation: none !important; }
+}
