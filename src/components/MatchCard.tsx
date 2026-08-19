@@ -26,8 +26,8 @@ export function MatchCard({ summary }: { summary: MatchSummary }) {
             MATCH {summary.matchNo}
           </span>
           {live && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-flag/15 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-flag">
-              <span className="anim-live h-1 w-1 rounded-full bg-flag" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-chalk/12 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-chalk">
+              <span className="anim-live h-1 w-1 rounded-full bg-chalk" />
               LIVE
             </span>
           )}

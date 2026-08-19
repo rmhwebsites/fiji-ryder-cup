@@ -35,7 +35,7 @@ export function LiveDot({
   pending: number;
 }) {
   const map: Record<string, { label: string; color: string; pulse: boolean }> = {
-    live: { label: "LIVE", color: "bg-gator", pulse: true },
+    live: { label: "LIVE", color: "bg-good", pulse: true },
     connecting: { label: "SYNCING", color: "bg-beer", pulse: true },
     offline: { label: "OFFLINE", color: "bg-flag", pulse: false },
     local: { label: "ON DEVICE", color: "bg-mute", pulse: false },
@@ -113,9 +113,9 @@ export function SegmentPill({
 const PACE_STYLE: Record<BeerStatus["pace"], string> = {
   sending: "text-beer border-beer/45 bg-beer/12",
   ahead: "text-beer border-beer/35 bg-beer/10",
-  "on-pace": "text-gator border-gator/35 bg-gator/10",
+  "on-pace": "text-good border-good/35 bg-good/10",
   behind: "text-orange-300 border-orange-400/35 bg-orange-400/10",
-  parched: "text-flag border-flag/40 bg-flag/12",
+  parched: "text-rose-300 border-rose-400/40 bg-rose-400/12",
   idle: "text-mute border-line bg-ink-3/40",
 };
 

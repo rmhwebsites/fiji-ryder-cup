@@ -6,7 +6,7 @@ import { BeerIcon } from "./ui";
 const NAME_COLOR: Record<string, string> = {
   albatross: "text-fuchsia-300",
   eagle: "text-amber-300",
-  birdie: "text-sky-300",
+  birdie: "text-cyan-300",
   par: "text-mute",
   bogey: "text-mute",
   double: "text-mute",

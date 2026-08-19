@@ -78,9 +78,9 @@ export const useCelebrate = () => useContext(Ctx);
 /* ── Confetti ──────────────────────────────────────────────────────────── */
 
 const CONFETTI_COLORS: Record<"badgers" | "gators" | "mixed", string[]> = {
-  badgers: ["#f0a92b", "#ffc861", "#fff0cf", "#b87d12"],
-  gators: ["#16b46b", "#3ee89a", "#d6ffe9", "#0d7a48"],
-  mixed: ["#f0a92b", "#16b46b", "#ffc861", "#3ee89a", "#f4f7fb"],
+  badgers: ["#2f80f0", "#79b3ff", "#d9e9ff", "#1b5bb5"],
+  gators: ["#e5484d", "#ff8085", "#ffd9da", "#a32126"],
+  mixed: ["#2f80f0", "#e5484d", "#79b3ff", "#ff8085", "#f4f7fb"],
 };
 
 function Confetti({
@@ -137,9 +137,9 @@ const SCORE_STYLE: Record<
   { ring: string; text: string; glow: string; confetti: number }
 > = {
   birdie: {
-    ring: "border-sky-300",
-    text: "text-sky-200",
-    glow: "shadow-[0_0_60px_rgba(125,211,252,0.55)]",
+    ring: "border-cyan-300",
+    text: "text-cyan-200",
+    glow: "shadow-[0_0_60px_rgba(103,232,249,0.55)]",
     confetti: 0,
   },
   eagle: {

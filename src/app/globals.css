@@ -12,18 +12,22 @@
   --color-chalk: #f4f7fb;
   --color-mute: #8494a8;
 
-  /* Honey Badgers — honey gold */
-  --color-badger: #f0a92b;
-  --color-badger-dim: #6a4a12;
-  --color-badger-glow: #ffc861;
+  /* Honey Badgers — blue */
+  --color-badger: #2f80f0;
+  --color-badger-dim: #14356e;
+  --color-badger-glow: #79b3ff;
 
-  /* Gators — swamp green */
-  --color-gator: #16b46b;
-  --color-gator-dim: #0d5233;
-  --color-gator-glow: #3ee89a;
+  /* Gators — red */
+  --color-gator: #e5484d;
+  --color-gator-dim: #6b1c20;
+  --color-gator-glow: #ff8085;
 
   --color-beer: #ffb42e;
-  --color-flag: #e8443a;
+
+  /* Semantic, deliberately not a team colour: on-pace beers, and the alert
+     tone for offline / a bad code. */
+  --color-good: #16b46b;
+  --color-flag: #ff7a18;
 
   /* System stacks — no webfont round trip, so the board paints instantly on
      a phone clinging to one bar of signal. */
