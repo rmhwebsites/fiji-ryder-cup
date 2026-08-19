@@ -34,11 +34,22 @@ sharing one live board, point it at Supabase.
 ### Supabase (5 minutes)
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. Open the **SQL Editor**, paste in [`supabase/schema.sql`](supabase/schema.sql),
-   and run it. That creates the two tables and switches on realtime.
-3. Copy `.env.example` to `.env.local` and fill in the project URL and anon key
-   from **Project Settings → Data API**.
+2. Apply the schema — two tables plus realtime. Either way works and both are
+   re-runnable:
+   - **SQL Editor** (simplest): paste in [`supabase/schema.sql`](supabase/schema.sql)
+     and run it.
+   - **CLI**: `supabase link --project-ref <ref>` then `supabase db push`, which
+     picks up [`supabase/migrations/`](supabase/migrations).
+3. Copy `.env.example` to `.env.local` and fill in the project URL and the
+   publishable (anon) key from **Project Settings → API Keys**.
 4. Restart `npm run dev`. The header should read **LIVE**.
+
+> **If `supabase db push` or `psql` cannot connect:** the direct connection
+> host, `db.<ref>.supabase.co`, resolves to IPv6 only. On an IPv4-only network
+> — most CI runners, some corporate and home connections — it will simply time
+> out. Use the **session pooler** string from **Project Settings → Database**
+> instead (`aws-<n>-<region>.pooler.supabase.com`), which is dual-stack. The
+> app itself is unaffected: it talks HTTPS to `<ref>.supabase.co`, not Postgres.
 
 ### Deploying
 
