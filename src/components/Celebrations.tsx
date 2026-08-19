@@ -184,7 +184,7 @@ function ScoreBurst({ c }: { c: ScoreCelebration }) {
             {SCORE_LABELS[c.name]}
           </p>
           <p className="mt-1 text-sm font-semibold text-chalk">{c.who}</p>
-          <p className="text-xs font-medium tracking-wide text-mute">
+          <p className="text-sm font-medium text-mute">
             Hole {c.hole}
           </p>
         </div>

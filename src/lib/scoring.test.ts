@@ -194,7 +194,7 @@ describe("beerStatus", () => {
 
   it("celebrates a pairing well clear of pace", () => {
     expect(beerStatus(10, 6).pace).toBe("sending");
-    expect(beerStatus(10, 6).label).toBe("SENDING IT");
+    expect(beerStatus(10, 6).label).toBe("Sending it");
   });
 
   it("caps expectation at the 18-beer requirement", () => {

@@ -250,12 +250,12 @@ export interface BeerStatus {
 }
 
 const PACE_LABELS: Record<BeerPace, string> = {
-  sending: "SENDING IT",
-  ahead: "AHEAD",
-  "on-pace": "ON PACE",
-  behind: "BEHIND",
-  parched: "PARCHED",
-  idle: "NOT STARTED",
+  sending: "Sending it",
+  ahead: "Ahead",
+  "on-pace": "On pace",
+  behind: "Behind",
+  parched: "Parched",
+  idle: "Not started",
 };
 
 /** Total beers a pairing has logged across every hole. */

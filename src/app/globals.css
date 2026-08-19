@@ -32,11 +32,11 @@
   --color-good: #0a7a48;
   --color-flag: #c2410c;
 
-  /* System stacks — no webfont round trip, so the board paints instantly on
-     a phone clinging to one bar of signal. */
-  --font-display: ui-sans-serif, -apple-system, "SF Pro Display", "Segoe UI",
+  /* Inter, self-hosted via next/font. The system stack behind it is what
+     paints during the swap, so nothing reflows into an empty screen. */
+  --font-display: var(--font-inter), ui-sans-serif, -apple-system, "Segoe UI",
     system-ui, "Helvetica Neue", sans-serif;
-  --font-sans: ui-sans-serif, -apple-system, "SF Pro Text", "Segoe UI",
+  --font-sans: var(--font-inter), ui-sans-serif, -apple-system, "Segoe UI",
     system-ui, "Helvetica Neue", sans-serif;
 }
 

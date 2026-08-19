@@ -26,7 +26,7 @@ export const TEAM_STYLE: Record<
   },
 };
 
-/** Small "LIVE" dot with the connection state behind it. */
+/** Small "Live" dot with the connection state behind it. */
 export function LiveDot({
   connection,
   pending,
@@ -35,22 +35,20 @@ export function LiveDot({
   pending: number;
 }) {
   const map: Record<string, { label: string; color: string; pulse: boolean }> = {
-    live: { label: "LIVE", color: "bg-good", pulse: true },
-    connecting: { label: "SYNCING", color: "bg-beer", pulse: true },
-    offline: { label: "OFFLINE", color: "bg-flag", pulse: false },
-    local: { label: "ON DEVICE", color: "bg-mute", pulse: false },
+    live: { label: "Live", color: "bg-good", pulse: true },
+    connecting: { label: "Syncing", color: "bg-beer", pulse: true },
+    offline: { label: "Offline", color: "bg-flag", pulse: false },
+    local: { label: "On device", color: "bg-mute", pulse: false },
   };
   const state = map[connection] ?? map.local;
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-mute">
+    <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold whitespace-nowrap text-mute">
       <span
-        className={`h-1.5 w-1.5 rounded-full ${state.color} ${state.pulse ? "anim-live" : ""}`}
+        className={`h-2 w-2 rounded-full ${state.color} ${state.pulse ? "anim-live" : ""}`}
       />
       {state.label}
-      {pending > 0 && (
-        <span className="text-beer">· {pending} queued</span>
-      )}
+      {pending > 0 && <span className="text-beer">· {pending} queued</span>}
     </span>
   );
 }
@@ -66,14 +64,13 @@ export function SegmentPill({
   compact?: boolean;
 }) {
   const meta = SEGMENT_META[status.segment];
+  const label = compact ? meta.short : meta.label;
 
   if (!status.started) {
     return (
-      <div className="flex-1 rounded-xl border border-line bg-ink-3/40 px-3 py-2">
-        <p className="text-[10px] font-bold tracking-widest text-mute">
-          {compact ? meta.short : meta.label.toUpperCase()}
-        </p>
-        <p className="text-sm font-bold text-mute">—</p>
+      <div className="flex-1 rounded-xl border border-line bg-ink-3/40 px-3 py-2.5">
+        <p className="text-sm font-semibold text-mute">{label}</p>
+        <p className="text-lg font-bold text-mute">—</p>
       </div>
     );
   }
@@ -82,27 +79,25 @@ export function SegmentPill({
 
   return (
     <div
-      className={`flex-1 rounded-xl border px-3 py-2 ${
+      className={`flex-1 rounded-xl border px-3 py-2.5 ${
         style ? `${style.bg} ${style.border}` : "border-line bg-ink-3/60"
       }`}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-[10px] font-bold tracking-widest text-mute">
-          {compact ? meta.short : meta.label.toUpperCase()}
-        </p>
-        <p className="text-[10px] font-semibold text-mute">
-          {status.finished ? "FINAL" : `thru ${status.thru}`}
+        <p className="text-sm font-semibold text-mute">{label}</p>
+        <p className="text-sm font-medium text-mute">
+          {status.finished ? "Final" : `thru ${status.thru}`}
         </p>
       </div>
       <p
-        className={`font-display text-lg leading-tight font-black tabular ${
+        className={`font-display text-2xl leading-tight font-extrabold tabular ${
           style ? style.text : "text-chalk"
         }`}
       >
         {status.result}
       </p>
       {status.leader && (
-        <p className="truncate text-[10px] font-semibold text-mute">
+        <p className="truncate text-sm font-medium text-mute">
           {TEAMS[status.leader].shortName}
         </p>
       )}
@@ -119,7 +114,7 @@ const PACE_STYLE: Record<BeerStatus["pace"], string> = {
   idle: "text-mute border-line bg-ink-3/40",
 };
 
-export function BeerIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
+export function BeerIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
       <path
@@ -146,15 +141,15 @@ export function BeerIcon({ className = "h-3.5 w-3.5" }: { className?: string }) 
 
 /**
  * Beer count for a pairing with its pace verdict. Before a group tees off the
- * verdict is dropped — ten cards all shouting NOT STARTED is just noise.
+ * verdict is dropped — ten cards all shouting "not started" is just noise.
  */
 export function BeerChip({ status }: { status: BeerStatus }) {
   const idle = status.pace === "idle";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold tracking-wide ${PACE_STYLE[status.pace]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-semibold ${PACE_STYLE[status.pace]}`}
     >
-      <BeerIcon />
+      <BeerIcon className="h-4 w-4" />
       <span className="tabular">{status.total}</span>
       {!idle && <span className="opacity-80">{status.label}</span>}
     </span>
@@ -169,14 +164,12 @@ export function SectionTitle({
   action?: { href: string; label: string };
 }) {
   return (
-    <div className="mb-2.5 flex items-baseline justify-between px-1">
-      <h2 className="text-[11px] font-bold tracking-[0.18em] text-mute">
-        {children}
-      </h2>
+    <div className="mb-3 flex items-baseline justify-between gap-3 px-1">
+      <h2 className="text-base font-bold text-chalk">{children}</h2>
       {action && (
         <Link
           href={action.href}
-          className="text-[11px] font-bold tracking-wide text-mute underline-offset-4 hover:text-chalk hover:underline"
+          className="shrink-0 text-sm font-semibold text-mute underline-offset-4 hover:text-chalk hover:underline"
         >
           {action.label}
         </Link>

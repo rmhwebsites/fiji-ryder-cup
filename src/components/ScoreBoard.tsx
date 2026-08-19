@@ -52,9 +52,7 @@ export function ScoreBoard({ standings }: { standings: Standings }) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 pt-5 pb-4">
           <TeamScore team="badgers" value={points.badgers} leading={leader === "badgers"} />
           <div className="pb-1 text-center">
-            <p className="font-display text-[10px] font-bold tracking-[0.2em] text-mute">
-              VS
-            </p>
+            <p className="font-display text-sm font-semibold text-mute">vs</p>
           </div>
           <TeamScore team="gators" value={points.gators} leading={leader === "gators"} align="right" />
         </div>
@@ -72,12 +70,12 @@ export function ScoreBoard({ standings }: { standings: Standings }) {
               style={{ width: `${gatorShare}%` }}
             />
           </div>
-          <div className="mt-2 flex items-center justify-between text-[10px] font-bold tracking-widest whitespace-nowrap text-mute">
-            <span>{fmt(POINTS_TO_WIN)} TO WIN</span>
-            <span>{TOTAL_POINTS} PTS</span>
+          <div className="mt-2.5 flex items-center justify-between gap-2 text-sm font-semibold whitespace-nowrap text-mute">
+            <span>{fmt(POINTS_TO_WIN)} to win</span>
+            <span>{TOTAL_POINTS} points</span>
           </div>
-          <p className="mt-1.5 text-center text-[11px] leading-tight font-black tracking-[0.12em] text-chalk">
-            {status.toUpperCase()}
+          <p className="mt-2 text-center text-lg leading-snug font-bold text-chalk">
+            {status}
           </p>
         </div>
 
@@ -108,14 +106,14 @@ function TeamScore({
   return (
     <div className={right ? "text-right" : "text-left"}>
       <p
-        className={`text-[11px] leading-tight font-bold tracking-[0.14em] ${
+        className={`text-base leading-snug font-bold ${
           leading ? color : "text-mute"
         }`}
       >
-        {TEAMS[team].name.toUpperCase()}
+        {TEAMS[team].name}
       </p>
       <p
-        className={`font-display text-6xl leading-none font-black tabular ${color} ${
+        className={`font-display text-7xl leading-none font-extrabold tabular ${color} ${
           leading ? "" : "opacity-65"
         }`}
       >
@@ -141,8 +139,10 @@ function BeerSide({
         className={`flex items-center gap-1.5 text-beer ${right ? "justify-end" : ""}`}
       >
         <BeerIcon className="h-4 w-4" />
-        <span className="font-display text-xl font-black tabular">{total}</span>
-        <span className="text-[10px] font-bold text-mute">
+        <span className="font-display text-2xl font-extrabold tabular">
+          {total}
+        </span>
+        <span className="text-sm font-semibold text-mute">
           / {TEAM_BEER_TARGET}
         </span>
       </div>

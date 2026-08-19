@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MATCHES } from "./tournament";
+import { COURSE_TIME_ZONE, MATCHES, roundDateLabel, teeLabel } from "./tournament";
 
 /** The draw exactly as it appears on the printed tee sheet. */
 const TEE_SHEET: [number, string, string[], string[]][] = [
@@ -22,7 +22,7 @@ describe("the draw", () => {
     for (const [no, teeTime, badgers, gators] of TEE_SHEET) {
       const match = MATCHES.find((m) => m.no === no);
       expect(match, `match ${no}`).toBeDefined();
-      expect(match!.teeTime).toBe(teeTime);
+      expect(teeLabel(match!.teeAt)).toBe(teeTime);
       expect(match!.badgers.map((p) => p.name)).toEqual(badgers);
       expect(match!.gators.map((p) => p.name)).toEqual(gators);
     }
@@ -37,13 +37,25 @@ describe("the draw", () => {
   });
 
   it("goes off in 12 minute intervals in numerical order", () => {
-    const minutes = MATCHES.map((m) => {
-      const [clock, meridiem] = m.teeTime.split(" ");
-      const [h, min] = clock.split(":").map(Number);
-      return ((h % 12) + (meridiem === "PM" ? 12 : 0)) * 60 + min;
-    });
+    const minutes = MATCHES.map((m) => new Date(m.teeAt).getTime() / 60_000);
     for (let i = 1; i < minutes.length; i++) {
       expect(minutes[i] - minutes[i - 1]).toBe(12);
+    }
+  });
+
+  it("plays on Thursday 20 August 2026, in course time", () => {
+    expect(roundDateLabel()).toBe("Thursday, August 20");
+
+    // August is daylight saving, so Eastern is UTC-4 that day. Storing these as
+    // -05:00 would silently move the whole draw an hour off the tee sheet.
+    const onTheDay = new Intl.DateTimeFormat("en-CA", {
+      timeZone: COURSE_TIME_ZONE,
+    });
+    for (const m of MATCHES) {
+      expect(onTheDay.format(new Date(m.teeAt)), `match ${m.no}`).toBe(
+        "2026-08-20",
+      );
+      expect(m.teeAt).toContain("-04:00");
     }
   });
 

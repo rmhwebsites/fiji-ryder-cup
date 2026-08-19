@@ -46,8 +46,9 @@ export interface Player {
 export interface Match {
   /** 1-10, and the primary key used everywhere including the database. */
   no: number;
-  /** Shotgun-free draw — groups go off the first tee 12 minutes apart. */
-  teeTime: string;
+  /** Absolute instant, not a wall-clock string, so "has this group teed off"
+   *  is answerable and the label is formatted in course time wherever you are. */
+  teeAt: string;
   badgers: [Player, Player];
   gators: [Player, Player];
 }
@@ -55,7 +56,7 @@ export interface Match {
 export const MATCHES: Match[] = [
   {
     no: 1,
-    teeTime: "2:00 PM",
+    teeAt: "2026-08-20T14:00:00-04:00",
     badgers: [
       { name: "Chris Tanagho", handicap: 22 },
       { name: "Henry Grimsley", handicap: 9 },
@@ -67,7 +68,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 2,
-    teeTime: "2:12 PM",
+    teeAt: "2026-08-20T14:12:00-04:00",
     badgers: [
       { name: "Steele Alkhas", handicap: 11 },
       { name: "Josh Brannan", handicap: 14 },
@@ -79,7 +80,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 3,
-    teeTime: "2:24 PM",
+    teeAt: "2026-08-20T14:24:00-04:00",
     badgers: [
       { name: "Charlie Sutton", handicap: 16 },
       { name: "Kiran Proctor", handicap: 3 },
@@ -91,7 +92,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 4,
-    teeTime: "2:36 PM",
+    teeAt: "2026-08-20T14:36:00-04:00",
     badgers: [
       { name: "Grady Bryan", handicap: 14 },
       { name: "Patrick Bryan", handicap: 10 },
@@ -103,7 +104,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 5,
-    teeTime: "2:48 PM",
+    teeAt: "2026-08-20T14:48:00-04:00",
     badgers: [
       { name: "Jack Voci", handicap: 16 },
       { name: "Elijah Pay", handicap: 19 },
@@ -115,7 +116,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 6,
-    teeTime: "3:00 PM",
+    teeAt: "2026-08-20T15:00:00-04:00",
     badgers: [
       { name: "Becker Curry", handicap: 10 },
       { name: "Clay Meredith", handicap: 16 },
@@ -127,7 +128,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 7,
-    teeTime: "3:12 PM",
+    teeAt: "2026-08-20T15:12:00-04:00",
     badgers: [
       { name: "Quinn Lyons", handicap: 9 },
       { name: "Ethan Hiers", handicap: 12 },
@@ -139,7 +140,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 8,
-    teeTime: "3:24 PM",
+    teeAt: "2026-08-20T15:24:00-04:00",
     badgers: [
       { name: "Blake Stern", handicap: 14 },
       { name: "Ethan Golan", handicap: 17 },
@@ -151,7 +152,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 9,
-    teeTime: "3:36 PM",
+    teeAt: "2026-08-20T15:36:00-04:00",
     badgers: [
       { name: "Campbell Gosslee", handicap: 1 },
       { name: "Brooks Longgrear", handicap: 7 },
@@ -163,7 +164,7 @@ export const MATCHES: Match[] = [
   },
   {
     no: 10,
-    teeTime: "3:48 PM",
+    teeAt: "2026-08-20T15:48:00-04:00",
     badgers: [
       { name: "Cole Dewey", handicap: 3 },
       { name: "Canon Brooks", handicap: 9 },
@@ -184,3 +185,46 @@ export const TOTAL_POINTS = MATCHES.length * 2;
 
 /** Points needed to win the cup outright. Level at 10-10 is a tie. */
 export const POINTS_TO_WIN = TOTAL_POINTS / 2 + 0.5;
+
+/* ── When ──────────────────────────────────────────────────────────────── */
+
+/**
+ * The round is Thursday 20 August 2026 at the UGA Golf Course, first tee 2:00 PM.
+ *
+ * Times are stored as absolute instants at -04:00. August sits inside daylight
+ * saving, so Eastern that day is EDT — writing -05:00 for "EST" would drag every
+ * tee time an hour earlier than the sheet says.
+ */
+export const FIRST_TEE = MATCHES[0].teeAt;
+export const LAST_TEE = MATCHES[MATCHES.length - 1].teeAt;
+
+/** Course time, so a phone that never left Pacific still reads the tee sheet. */
+export const COURSE_TIME_ZONE = "America/New_York";
+
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: COURSE_TIME_ZONE,
+});
+
+const dateFormat = new Intl.DateTimeFormat("en-US", {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  timeZone: COURSE_TIME_ZONE,
+});
+
+/** "2:00 PM" */
+export function teeLabel(teeAt: string): string {
+  return timeFormat.format(new Date(teeAt));
+}
+
+/** "Thursday, August 20" */
+export function roundDateLabel(): string {
+  return dateFormat.format(new Date(FIRST_TEE));
+}
+
+/** Whether a group is past its tee time. Drives "yet to tee off" copy. */
+export function hasTeedOff(teeAt: string, now: Date = new Date()): boolean {
+  return now.getTime() >= new Date(teeAt).getTime();
+}
