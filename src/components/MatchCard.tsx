@@ -44,13 +44,13 @@ export function MatchCard({ summary }: { summary: MatchSummary }) {
             MATCH {summary.matchNo}
           </span>
           {live && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-chalk/12 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-chalk">
-              <span className="anim-live h-1 w-1 rounded-full bg-chalk" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-chalk/10 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-chalk">
+              <span className="anim-live h-1 w-1 rounded-full bg-flag" />
               LIVE
             </span>
           )}
           {summary.complete && (
-            <span className="rounded-full bg-line/60 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-mute">
+            <span className="rounded-full bg-line px-1.5 py-0.5 text-[9px] font-black tracking-wider text-mute">
               FINAL
             </span>
           )}

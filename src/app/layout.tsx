@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "FIJI Ryder Cup",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07090c",
+  themeColor: "#eef2f7",
   width: "device-width",
   initialScale: 1,
   // Stop a double-tap on the score stepper zooming the page mid-round.

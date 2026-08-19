@@ -3,8 +3,9 @@
 Live matchplay scoring for the FIJI Ryder Cup — **Honey Badgers vs Gators**,
 10 groups, 40 players, at the UGA Golf Course in Athens, GA.
 
-Built mobile first. Players enter scores from the tee box, everyone else
-watches the board move.
+Built mobile first and light themed, for a phone held at arm's length in
+Georgia sun. Players enter scores from the tee box, everyone else watches the
+board move.
 
 ## The format
 

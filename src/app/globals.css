@@ -5,29 +5,32 @@
    ─────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  --color-ink: #07090c;
-  --color-ink-2: #0d1117;
-  --color-ink-3: #151b24;
-  --color-line: #222c39;
-  --color-chalk: #f4f7fb;
-  --color-mute: #8494a8;
+  /* Light, and built for the situation it is used in: a phone held at arm's
+     length in Georgia sun. Paper-white cards on a cool grey page, ink-dark
+     text, and accents darkened enough to stay legible on white. */
+  --color-ink: #eef2f7;
+  --color-ink-2: #ffffff;
+  --color-ink-3: #f4f7fb;
+  --color-line: #d8e0ea;
+  --color-chalk: #0d1626;
+  --color-mute: #64748b;
 
   /* Honey Badgers — blue */
-  --color-badger: #2f80f0;
-  --color-badger-dim: #14356e;
-  --color-badger-glow: #79b3ff;
+  --color-badger: #1a5fd0;
+  --color-badger-dim: #b9d2f7;
+  --color-badger-glow: #4a90ee;
 
   /* Gators — red */
-  --color-gator: #e5484d;
-  --color-gator-dim: #6b1c20;
-  --color-gator-glow: #ff8085;
+  --color-gator: #c92a33;
+  --color-gator-dim: #f8c8cb;
+  --color-gator-glow: #e75a62;
 
-  --color-beer: #ffb42e;
+  --color-beer: #a86a00;
 
   /* Semantic, deliberately not a team colour: on-pace beers, and the alert
      tone for offline / a bad code. */
-  --color-good: #16b46b;
-  --color-flag: #ff7a18;
+  --color-good: #0a7a48;
+  --color-flag: #c2410c;
 
   /* System stacks — no webfont round trip, so the board paints instantly on
      a phone clinging to one bar of signal. */
@@ -38,7 +41,7 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {

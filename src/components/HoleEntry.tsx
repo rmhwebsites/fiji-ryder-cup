@@ -4,9 +4,9 @@ import { parForHole, SCORE_LABELS, scoreName } from "@/lib/course";
 import { BeerIcon } from "./ui";
 
 const NAME_COLOR: Record<string, string> = {
-  albatross: "text-fuchsia-300",
-  eagle: "text-amber-300",
-  birdie: "text-cyan-300",
+  albatross: "text-fuchsia-700",
+  eagle: "text-amber-700",
+  birdie: "text-cyan-700",
   par: "text-mute",
   bogey: "text-mute",
   double: "text-mute",

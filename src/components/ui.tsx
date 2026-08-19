@@ -114,8 +114,8 @@ const PACE_STYLE: Record<BeerStatus["pace"], string> = {
   sending: "text-beer border-beer/45 bg-beer/12",
   ahead: "text-beer border-beer/35 bg-beer/10",
   "on-pace": "text-good border-good/35 bg-good/10",
-  behind: "text-orange-300 border-orange-400/35 bg-orange-400/10",
-  parched: "text-rose-300 border-rose-400/40 bg-rose-400/12",
+  behind: "text-orange-700 border-orange-400/50 bg-orange-400/12",
+  parched: "text-rose-700 border-rose-400/50 bg-rose-400/12",
   idle: "text-mute border-line bg-ink-3/40",
 };
 

@@ -78,9 +78,9 @@ export const useCelebrate = () => useContext(Ctx);
 /* ── Confetti ──────────────────────────────────────────────────────────── */
 
 const CONFETTI_COLORS: Record<"badgers" | "gators" | "mixed", string[]> = {
-  badgers: ["#2f80f0", "#79b3ff", "#d9e9ff", "#1b5bb5"],
-  gators: ["#e5484d", "#ff8085", "#ffd9da", "#a32126"],
-  mixed: ["#2f80f0", "#e5484d", "#79b3ff", "#ff8085", "#f4f7fb"],
+  badgers: ["#1a5fd0", "#4a90ee", "#0d3f8f", "#7fb2f5"],
+  gators: ["#c92a33", "#e75a62", "#8f1a21", "#f28a90"],
+  mixed: ["#1a5fd0", "#c92a33", "#4a90ee", "#e75a62", "#a86a00"],
 };
 
 function Confetti({
@@ -137,21 +137,21 @@ const SCORE_STYLE: Record<
   { ring: string; text: string; glow: string; confetti: number }
 > = {
   birdie: {
-    ring: "border-cyan-300",
-    text: "text-cyan-200",
-    glow: "shadow-[0_0_60px_rgba(103,232,249,0.55)]",
+    ring: "border-cyan-500",
+    text: "text-cyan-700",
+    glow: "shadow-[0_18px_50px_-12px_rgba(14,116,144,0.45)]",
     confetti: 0,
   },
   eagle: {
-    ring: "border-amber-300",
-    text: "text-amber-200",
-    glow: "shadow-[0_0_80px_rgba(252,211,77,0.7)]",
+    ring: "border-amber-500",
+    text: "text-amber-700",
+    glow: "shadow-[0_18px_60px_-12px_rgba(180,83,9,0.5)]",
     confetti: 36,
   },
   albatross: {
-    ring: "border-fuchsia-300",
-    text: "text-fuchsia-200",
-    glow: "shadow-[0_0_100px_rgba(240,171,252,0.8)]",
+    ring: "border-fuchsia-500",
+    text: "text-fuchsia-700",
+    glow: "shadow-[0_18px_70px_-12px_rgba(162,28,175,0.5)]",
     confetti: 60,
   },
 };
@@ -176,7 +176,7 @@ function ScoreBurst({ c }: { c: ScoreCelebration }) {
           style={{ animationDelay: "160ms" }}
         />
         <div
-          className={`anim-pop relative rounded-2xl border border-white/15 bg-ink-2/95 px-7 py-5 text-center backdrop-blur ${style.glow}`}
+          className={`anim-pop relative rounded-2xl border border-line bg-ink-2/97 px-7 py-5 text-center backdrop-blur ${style.glow}`}
         >
           <p
             className={`font-display text-4xl font-black tracking-tight ${style.text}`}
@@ -197,7 +197,7 @@ function ScoreBurst({ c }: { c: ScoreCelebration }) {
 
 function PointBanner({ c }: { c: PointCelebration }) {
   const accent = c.halved
-    ? "from-badger via-chalk to-gator"
+    ? "from-badger via-ink-2 to-gator"
     : c.team === "badgers"
       ? "from-badger-dim via-badger to-badger-glow"
       : "from-gator-dim via-gator to-gator-glow";
@@ -210,7 +210,7 @@ function PointBanner({ c }: { c: PointCelebration }) {
         count={c.halved ? 50 : 56}
       />
       <div className="pointer-events-none fixed inset-x-0 top-0 z-[70] px-3 pt-3">
-        <div className="anim-banner mx-auto max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-ink-2/95 shadow-2xl backdrop-blur">
+        <div className="anim-banner mx-auto max-w-lg overflow-hidden rounded-2xl border border-line bg-ink-2/97 shadow-[0_20px_60px_-15px_rgba(13,22,38,0.35)] backdrop-blur">
           <div className={`h-1.5 w-full bg-gradient-to-r ${accent}`} />
           <div className="flex items-center gap-3 px-4 py-3">
             <div
